@@ -1,0 +1,14 @@
+/bin/
+/decaf-dev-doc/
+/tools/
+/result/
+decaf.jar
+/TestCases/
+/test/
+*.py
+*.swp
+*.xml
+*.sh
+/Lab-lectures/
+/tacvm-dev/
+
