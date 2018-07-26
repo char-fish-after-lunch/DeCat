@@ -300,7 +300,20 @@ public class RiscV implements MachineDescription{
 	}
 	
 	private void genAsmForCall(BasicBlock bb, Tac call) {
-		
+		for (Temp t : call.saves){
+			bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT4, "sw", t.reg, t.offset, "s0"));
+		}
+		if (call.opc == Tac.Kind.DIRECT_CALL){
+			bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT1, "call", call.label));
+		} else {
+			bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT1, "tail", call.label));
+		}
+		if (call.op0 != null){
+			bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT2, "move", call.op0.reg, "a0"));
+		}
+		for (Temp t : call.saves){
+			bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT4, "lw", t.reg, t.offset, "s0"));
+		}
 	}
 	
 	private void emitTrace(BasicBlock bb, FlowGraph graph) {
