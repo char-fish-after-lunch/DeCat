@@ -163,7 +163,87 @@ public class RiscV implements MachineDescription{
 					bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT3, "or", tac.op0.reg, tac.op1.reg, tac.op2.reg));
 					break;
 				
-		}
+				case GTR: // Use slt and Swap Reg 1 and Reg 2
+					bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT3, "slt", tac.op0.reg, tac.op2.reg, tac.op1.reg));
+					break;
+				
+				case GEQ:
+					bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT3, "slt", tac.op0.reg, tac.op1.reg, tac.op2.reg));
+					bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT3, "xori", tac.op0.reg, tac.op0.reg, 1));
+					break;
+
+				case EQU:
+					bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT3, "sub", tac.op0.reg, tac.op1.reg, tac.op2.reg));
+					bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT2, "seqz", tac.op0.reg, tac.op0.reg));
+					break;
+
+				case NEQ:
+					bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT3, "sub", tac.op0.reg, tac.op1.reg, tac.op2.reg));
+					bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT3, "snez", tac.op0.reg, tac.op0.reg));
+					break;
+
+				case LEQ:
+					bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT3, "slt", tac.op0.reg, tac.op2.reg, tac.op1.reg));
+					bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT3, "xori", tac.op0.reg, tac.op0.reg, 1));
+					break;
+
+				case LES:
+					bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT3, "slt", tac.op0.reg, tac.op1.reg, tac.op2.reg));
+					break;
+
+				case NEG:
+					bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT3, "neg", tac.op0.reg, tac.op1.reg, tac.op2.reg));
+					break;
+				
+				case LNOT:
+					bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT3, "not", tac.op0.reg, tac.op1.reg, tac.op2.reg));
+					break;
+
+				case ASSIGN:
+					if (tac.op0.reg != tac.op1.reg){
+						bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT2, "mv", tac.op0.reg, tac.op1.reg));
+					}
+					break;
+
+				case LOAD_VTBL:
+					bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT2, "la", tac.op0.reg, tac.vt.name));
+					break;
+
+				case LOAD_IMM4:
+					if (!tac.op1.isConst){
+						throw new IllegalArgumentException();
+					}
+					bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT2, "li", tac.op0.reg, tac.op1.value));
+					break;
+
+				case LOAD_STR_CONST:
+					String label = getStringConstLabel(tac.str);
+					bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT2, "la", tac.op0.reg, label));
+					break;
+
+				case INDIRECT_CALL:
+				case DIRECT_CALL:
+					genAsmForCall(bb, tac);
+					break;
+
+				case PARM:
+					bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT4, "sw", tac.op0.reg, tac.op1.value, "sp"));
+					break;
+
+				case LOAD:
+					bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT4, "lw", tac.op0.reg, tac.op2.value, tac.op1.value));
+					break;
+
+				case STORE:
+					bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT4, "sw", tac.op0.reg, tac.op2.value, tac.op1.value));
+					break;
+
+				case BRANCH:
+				case BEQZ:
+				case BNEZ:
+				case RETURN:
+					throw new IllegalArgumentException();
+		}		
 	
 		}
 	}
@@ -193,6 +273,7 @@ public class RiscV implements MachineDescription{
 	public void emitAsm(List<FlowGraph> gs) {
 		// TODO Auto-generated method stub
 		emit(null, ".section .text", null);
+		
 		for (FlowGraph g : gs) {
 			regAllocator.reset();
 			for (BasicBlock bb : g) {
@@ -213,11 +294,17 @@ public class RiscV implements MachineDescription{
 			emitTrace(g.getBlock(0), g);
 			output.println();
 		}
-		for (int i = 0; i < 3; i++) {
-			output.println();
-		}
+		
+		for (int i = 0; i < 3; i++) {output.println();}
 		emitStringConst();
 	}
-
+	
+	private void genAsmForCall(BasicBlock bb, Tac call) {
+		
+	}
+	
+	private void emitTrace(BasicBlock bb, FlowGraph graph) {
+		
+	}
 	
 }
