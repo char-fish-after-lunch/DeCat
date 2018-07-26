@@ -98,7 +98,101 @@ public class RiscV implements MachineDescription{
 
 	private void emit(String label, String body, String comment) {
 		output.println(emitToString(label, body, comment));
-		//TODO:  Generate System Call Code
+	}
+
+	private String emitToString(String label, String body, String comment) {
+		if (comment != null && label == null && body == null) {
+			return "                                        # " + comment;
+		} else {
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			if (label != null) {
+				if (body == null) {
+					pw.format("%-40s", label + ":");
+				} else {
+					pw.println(label + ":");
+				}
+			}
+			if (body != null) {
+				pw.format("          %-30s", body);
+			}
+			if (comment != null) {
+				pw.print("# " + comment);
+			}
+			pw.close();
+			return sw.toString();
+		}
+	}
+
+	
+	private void emitStringConst() {
+		emit(null, ".section .rodata", null);
+		for (Entry<String, String> e : stringConst.entrySet()) {
+			emit(e.getValue(), ".string " + MiscUtils.quote(e.getKey()), null);
+		}
+	}
+
+	private void genAsmForBB(BasicBlock bb) {
+		for(Tac tac = bb.tacList; tac != null; tac = tac.next){
+			switch (tac.opc) {
+				case ADD:
+					bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT3, "add", tac.op0.reg, tac.op1.reg, tac.op2.reg));
+					break;
+				
+				case SUB:
+					bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT3, "sub", tac.op0.reg, tac.op1.reg, tac.op2.reg));
+					break;
+				
+				case MUL: //TODO Does not support mul, need to change to call
+					bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT3, "mul", tac.op0.reg, tac.op1.reg, tac.op2.reg));
+					break;
+				
+				case DIV: //TODO Does not support div, need to change to call
+					bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT3, "div", tac.op0.reg, tac.op1.reg, tac.op2.reg));
+					break;
+				
+				case MOD: //TODO Does not support rem, need to change to call
+					bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT3, "rem", tac.op0.reg, tac.op1.reg, tac.op2.reg));
+					break;
+				
+				case LAND:
+					bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT3, "and", tac.op0.reg,tac.op1.reg, tac.op2.reg));
+					break;
+				
+				case LOR:
+					bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT3, "or", tac.op0.reg, tac.op1.reg, tac.op2.reg));
+					break;
+				
+		}
+	
+		}
+	}
+	
+	@Override
+	public void setOutputStream(PrintWriter pw) {
+		// TODO Auto-generated method stub
+		this.output = pw;
+	}
+
+	@Override
+	public void emitVTable(List<VTable> vtables) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	private void emitProlog(Label entryLabel, int frameSize) {
+		emit(entryLabel.name, null, "function entry");
+		emit(null, "sw s0, 0(sp)", null);
+		emit(null, "sw ra, -4(sp)", null);
+		emit(null, "move s0, sp", null);
+		emit(null, "addi sp, sp, "
+				+ (-frameSize - 2 * OffsetCounter.POINTER_SIZE), null);
+	}
+	
+	@Override
+	public void emitAsm(List<FlowGraph> gs) {
+		// TODO Auto-generated method stub
+		emit(null, ".section .text", null);
 		for (FlowGraph g : gs) {
 			regAllocator.reset();
 			for (BasicBlock bb : g) {
@@ -123,26 +217,6 @@ public class RiscV implements MachineDescription{
 			output.println();
 		}
 		emitStringConst();
-	}
-
-	@Override
-	public void setOutputStream(PrintWriter pw) {
-		// TODO Auto-generated method stub
-		this.output = pw;
-	}
-
-	@Override
-	public void emitVTable(List<VTable> vtables) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void emitAsm(List<FlowGraph> gs) {
-		// TODO Auto-generated method stub
-		emit(null, ".section .text", null);
-
-
 	}
 
 	
