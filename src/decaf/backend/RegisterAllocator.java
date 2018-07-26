@@ -12,19 +12,26 @@ import decaf.tac.Temp;
 public class RegisterAllocator {
 	private BasicBlock bb;
 
-	private MipsFrameManager frameManager;
+	private RiscVFrameManager frameManager;
 
 	private Register[] regs;
 
 	private Temp fp;
 
-	public RegisterAllocator(Temp fp, MipsFrameManager frameManager,
+//	public RegisterAllocator(Temp fp, MipsFrameManager frameManager,
+//			Register[] regs) {
+//		this.fp = fp;
+//		this.frameManager = frameManager;
+//		this.regs = regs;
+//	}
+	
+	public RegisterAllocator(Temp fp, RiscVFrameManager frameManager,
 			Register[] regs) {
 		this.fp = fp;
 		this.frameManager = frameManager;
 		this.regs = regs;
 	}
-
+	
 	public void reset() {
 		frameManager.reset();
 	}
