@@ -265,8 +265,7 @@ public class RiscV implements MachineDescription{
 		emit(null, "sw s0, 0(sp)", null);
 		emit(null, "sw ra, -4(sp)", null);
 		emit(null, "move s0, sp", null);
-		emit(null, "addi sp, sp, "
-				+ (-frameSize - 2 * OffsetCounter.POINTER_SIZE), null);
+		emit(null, "addi sp, sp, " + (-frameSize - 2 * OffsetCounter.POINTER_SIZE), null);
 	}
 	
 	@Override
@@ -317,7 +316,47 @@ public class RiscV implements MachineDescription{
 	}
 	
 	private void emitTrace(BasicBlock bb, FlowGraph graph) {
-		
+		if (bb.mark){return ;}
+		bb.mark = true;
+		emit(bb.label.name, null, null);
+		for (Asm asm: bb.getAsms()){
+			emit(null, asm.toString(), null);
+		}
+		BasicBlock directNext;
+		switch(bb.endKind){
+			case BY_BRANCH:
+				directNext = graph.getBlock(bb.next[0]);
+				if (directNext.mark) {
+					emit(null, String.format(RiscVAsm.FORMAT1, "j", directNext.label.name), null);
+				} else {
+					emitTrace(directNext, graph);
+				}
+				break;
+			case BY_BEQZ:
+			case BY_BNEZ:
+				if (bb.endKind == EndKind.BY_BEQZ) {
+					emit(null, String.format(RiscVAsm.FORMAT2, "beqz", bb.varReg, graph.getBlock(bb.next[0]).label.name), null);
+				} else {
+					emit(null, String.format(RiscVAsm.FORMAT2, "bnez", bb.varReg, graph.getBlock(bb.next[0]).label.name), null);
+				}
+				directNext = graph.getBlock(bb.next[1]);
+				if (directNext.mark) {
+					emit(null, String.format(RiscVAsm.FORMAT1, "j", directNext.label.name), null);
+				} else {
+					emitTrace(directNext, graph);
+				}
+				emitTrace(graph.getBlock(bb.next[0]), graph);
+				break;
+			case BY_RETURN:
+				if (bb.var != null) {
+					emit(null, String.format(RiscVAsm.FORMAT2, "mv", "a0", bb.varReg), null);
+				}
+				emit(null, String.format(RiscVAsm.FORMAT2, "move", "sp", "s0"), null);
+				emit(null, String.format(RiscVAsm.FORMAT2, "lw", "ra", "-4(s0)"), null);
+				emit(null, String.format(RiscVAsm.FORMAT2, "lw", "s0", "0(s0)"), null);
+				emit(null, String.format(RiscVAsm.FORMAT2, "jr", "ra"), null);
+				break;
+		}
 	}
 	
 }
