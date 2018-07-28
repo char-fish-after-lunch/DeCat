@@ -144,7 +144,7 @@ public class RiscV implements MachineDescription{
 		emitIntrinsicFunc("_PrintInteger", 1);
 		emitIntrinsicFunc("_PrintString",1);
 		emitIntrinsicFunc("_Alloc",1);
-		emitIntrinsicFunc("_ReadInterger",1);
+		emitIntrinsicFunc("_ReadInteger",1);
 		emitIntrinsicFunc("_ReadString",1);
 	}
 	
@@ -247,11 +247,11 @@ public class RiscV implements MachineDescription{
 					break;
 
 				case LOAD:
-					bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT4, "lw", tac.op0.reg, tac.op2.value, tac.op1.value));
+					bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT4, "lw", tac.op0.reg, tac.op2.value, tac.op1.reg));
 					break;
 
 				case STORE:
-					bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT4, "sw", tac.op0.reg, tac.op2.value, tac.op1.value));
+					bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT4, "sw", tac.op0.reg, tac.op2.value, tac.op1.reg));
 					break;
 
 				case BRANCH:
