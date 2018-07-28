@@ -8,7 +8,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import decaf.tree.Tree;
-import decaf.backend.Mips;
+import decaf.backend.RiscV;
 import decaf.dataflow.FlowGraph;
 import decaf.error.DecafError;
 import decaf.frontend.Lexer;
@@ -127,13 +127,13 @@ public final class Driver {
 			return;
 		}
 
-		MachineDescription md = new Mips();
-		md.setOutputStream(pw);
-		md.emitVTable(tr.getVtables());
+		MachineDescription riscv = new RiscV();
+		riscv.setOutputStream(pw);
+		riscv.emitVTable(tr.getVtables());
 		for (int i = 0; i < 3; i++) {
 			pw.println();
 		}
-		md.emitAsm(graphs);
+		riscv.emitAsm(graphs);
 		pw.close();
 	}
 

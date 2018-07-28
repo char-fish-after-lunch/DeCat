@@ -131,7 +131,23 @@ public class RiscV implements MachineDescription{
 			emit(e.getValue(), ".string " + MiscUtils.quote(e.getKey()), null);
 		}
 	}
-
+	private void emitIntrinsicFunc(String name, int nargs) {
+		emit(name, null, null);
+		for (int i = 0; i < nargs; i++) {
+			emit(null, String.format(RiscVAsm.FORMAT4, "lw", "a" + i, 4 * (i + 1), "sp"), null);
+		}
+		emit(null, String.format(RiscVAsm.FORMAT1, "tail", "_catlib_"+name), null);
+		emit(null, String.format(RiscVAsm.FORMAT1, "jr","ra") ,null);
+	}
+	
+	private void emitIntrinsic() {
+		emitIntrinsicFunc("_PrintInteger", 1);
+		emitIntrinsicFunc("_PrintString",1);
+		emitIntrinsicFunc("_Alloc",1);
+		emitIntrinsicFunc("_ReadInterger",1);
+		emitIntrinsicFunc("_ReadString",1);
+	}
+	
 	private void genAsmForBB(BasicBlock bb) {
 		for(Tac tac = bb.tacList; tac != null; tac = tac.next){
 			switch (tac.opc) {
@@ -179,7 +195,7 @@ public class RiscV implements MachineDescription{
 
 				case NEQ:
 					bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT3, "sub", tac.op0.reg, tac.op1.reg, tac.op2.reg));
-					bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT3, "snez", tac.op0.reg, tac.op0.reg));
+					bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT2, "snez", tac.op0.reg, tac.op0.reg));
 					break;
 
 				case LEQ:
@@ -192,11 +208,11 @@ public class RiscV implements MachineDescription{
 					break;
 
 				case NEG:
-					bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT3, "neg", tac.op0.reg, tac.op1.reg, tac.op2.reg));
+					bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT2, "neg", tac.op0.reg, tac.op1.reg));
 					break;
 				
 				case LNOT:
-					bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT3, "not", tac.op0.reg, tac.op1.reg, tac.op2.reg));
+					bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT2, "not", tac.op0.reg, tac.op1.reg));
 					break;
 
 				case ASSIGN:
@@ -257,7 +273,22 @@ public class RiscV implements MachineDescription{
 	@Override
 	public void emitVTable(List<VTable> vtables) {
 		// TODO Auto-generated method stub
-		
+		emit(null, ".text", null);
+		emit(null, ".globl main", null);
+
+		for (VTable vt : vtables) {
+			emit(null, null, null);
+			emit(null, ".data", null);
+			emit(null, ".align 2", null);
+			emit(vt.name, null, "virtual table");
+			emit(null, ".word " + (vt.parent == null ? "0" : vt.parent.name),
+					"parent");
+			emit(null, ".word " + getStringConstLabel(vt.className),
+					"class name");
+			for (Label l : vt.entries) {
+				emit(null, ".word " + l.name, null);
+			}
+		}
 	}
 	
 	private void emitProlog(Label entryLabel, int frameSize) {
@@ -271,7 +302,9 @@ public class RiscV implements MachineDescription{
 	@Override
 	public void emitAsm(List<FlowGraph> gs) {
 		// TODO Auto-generated method stub
+		
 		emit(null, ".section .text", null);
+		emitIntrinsic();
 		
 		for (FlowGraph g : gs) {
 			regAllocator.reset();
@@ -294,7 +327,6 @@ public class RiscV implements MachineDescription{
 			output.println();
 		}
 		
-		for (int i = 0; i < 3; i++) {output.println();}
 		emitStringConst();
 	}
 	
@@ -305,7 +337,7 @@ public class RiscV implements MachineDescription{
 		if (call.opc == Tac.Kind.DIRECT_CALL){
 			bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT1, "call", call.label));
 		} else {
-			bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT1, "tail", call.label));
+			bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT1, "jalr", call.op1.reg));
 		}
 		if (call.op0 != null){
 			bb.appendAsm(new RiscVAsm(RiscVAsm.FORMAT2, "move", call.op0.reg, "a0"));
@@ -354,9 +386,10 @@ public class RiscV implements MachineDescription{
 				emit(null, String.format(RiscVAsm.FORMAT2, "move", "sp", "s0"), null);
 				emit(null, String.format(RiscVAsm.FORMAT2, "lw", "ra", "-4(s0)"), null);
 				emit(null, String.format(RiscVAsm.FORMAT2, "lw", "s0", "0(s0)"), null);
-				emit(null, String.format(RiscVAsm.FORMAT2, "jr", "ra"), null);
+				emit(null, String.format(RiscVAsm.FORMAT1, "jr", "ra"), null);
 				break;
 		}
 	}
+	
 	
 }
