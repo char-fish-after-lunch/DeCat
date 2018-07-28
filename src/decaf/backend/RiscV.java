@@ -146,6 +146,7 @@ public class RiscV implements MachineDescription{
 		emitIntrinsicFunc("_Alloc",1);
 		emitIntrinsicFunc("_ReadInteger",1);
 		emitIntrinsicFunc("_ReadString",1);
+		emitIntrinsicFunc("_Halt",0);
 	}
 	
 	private void genAsmForBB(BasicBlock bb) {

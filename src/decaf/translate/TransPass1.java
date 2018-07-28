@@ -35,8 +35,7 @@ public class TransPass1 extends Tree.Visitor {
 		}
 		for (Tree.ClassDef cd : program.classes) {
 			if (cd.parent != null) {
-				cd.symbol.getVtable().parent = cd.symbol.getParent()
-						.getVtable();
+				cd.symbol.getVtable().parent = cd.symbol.getParent().getVtable();
 			}
 		}
 	}
