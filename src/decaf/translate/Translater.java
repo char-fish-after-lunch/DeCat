@@ -174,20 +174,26 @@ public class Translater {
 	}
 
 	public Temp genMul(Temp src1, Temp src2) {
-		Temp dst = Temp.createTempI4();
-		append(Tac.genMul(dst, src1, src2));
+		genParm(src1);
+		genParm(src2);
+		Temp dst = genIntrinsicCall(Intrinsic.MUL);
+		//append(Tac.genMul(dst, src1, src2)); not support by soc
 		return dst;
 	}
 
 	public Temp genDiv(Temp src1, Temp src2) {
-		Temp dst = Temp.createTempI4();
-		append(Tac.genDiv(dst, src1, src2));
+		genParm(src1);
+		genParm(src2);
+		Temp dst = genIntrinsicCall(Intrinsic.DIV);
+		//append(Tac.genMul(dst, src1, src2)); not support by soc
 		return dst;
 	}
 
 	public Temp genMod(Temp src1, Temp src2) {
-		Temp dst = Temp.createTempI4();
-		append(Tac.genMod(dst, src1, src2));
+		genParm(src1);
+		genParm(src2);
+		Temp dst = genIntrinsicCall(Intrinsic.MOD);
+		//append(Tac.genMul(dst, src1, src2)); not support by soc
 		return dst;
 	}
 

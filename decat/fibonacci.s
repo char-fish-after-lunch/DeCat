@@ -25,17 +25,39 @@ _PrintString:
           lw    a0, 4(sp)               
           tail  _catlib__PrintString    
           jr    ra                      
+_PrintBool:                             
+          lw    a0, 4(sp)               
+          tail  _catlib__PrintBool      
+          jr    ra                      
 _Alloc:                                 
           lw    a0, 4(sp)               
           tail  _catlib__Alloc          
           jr    ra                      
 _ReadInteger:                           
-          lw    a0, 4(sp)               
           tail  _catlib__ReadInteger    
           jr    ra                      
-_ReadString:                            
+_ReadLine:                              
+          tail  _catlib__ReadLine       
+          jr    ra                      
+_MUL:                                   
           lw    a0, 4(sp)               
-          tail  _catlib__ReadString     
+          lw    a1, 8(sp)               
+          tail  _catlib__MUL            
+          jr    ra                      
+_DIV:                                   
+          lw    a0, 4(sp)               
+          lw    a1, 8(sp)               
+          tail  _catlib__DIV            
+          jr    ra                      
+_MOD:                                   
+          lw    a0, 4(sp)               
+          lw    a1, 8(sp)               
+          tail  _catlib__MOD            
+          jr    ra                      
+_StringEqual:                           
+          lw    a0, 4(sp)               
+          lw    a1, 8(sp)               
+          tail  _catlib__StringEqual    
           jr    ra                      
 _Halt:                                  
           tail  _catlib__Halt           
@@ -45,7 +67,7 @@ _Main_New:                              # function entry
           sw ra, -4(sp)                 
           move s0, sp                   
           addi sp, sp, -16              
-_L15:                                   
+_L18:                                   
           li    s2, 4                   
           sw    s2, 4(sp)               
           call  _Alloc                  
@@ -63,7 +85,7 @@ _Fibonacci_New:                         # function entry
           sw ra, -4(sp)                 
           move s0, sp                   
           addi sp, sp, -16              
-_L16:                                   
+_L19:                                   
           li    s2, 4                   
           sw    s2, 4(sp)               
           call  _Alloc                  
@@ -81,7 +103,7 @@ main:                                   # function entry
           sw ra, -4(sp)                 
           move s0, sp                   
           addi sp, sp, -28              
-_L17:                                   
+_L20:                                   
           call  _Fibonacci_New          
           move  s2, a0                  
           mv    s3, s2                  
@@ -89,13 +111,13 @@ _L17:
           mv    s4, s2                  
           sw    s4, -8(s0)              
           sw    s3, -12(s0)             
-_L18:                                   
+_L21:                                   
           li    s2, 10                  
           lw    s3, -8(s0)              
           slt   s4, s3, s2              
           sw    s3, -8(s0)              
-          beqz  s4, _L20                
-_L19:                                   
+          beqz  s4, _L23                
+_L22:                                   
           lw    s2, -12(s0)             
           sw    s2, 4(sp)               
           lw    s3, -8(s0)              
@@ -126,8 +148,8 @@ _L19:
           mv    s3, s5                  
           sw    s3, -8(s0)              
           sw    s2, -12(s0)             
-          j     _L18                    
-_L20:                                   
+          j     _L21                    
+_L23:                                   
           call  _ReadInteger            
           move  s2, a0                  
           mv    s3, s2                  
@@ -153,20 +175,20 @@ _Fibonacci.get:                         # function entry
           sw ra, -4(sp)                 
           move s0, sp                   
           addi sp, sp, -24              
-_L21:                                   
+_L24:                                   
           li    s2, 2                   
           lw    s3, 8(s0)               
           slt   s4, s3, s2              
           sw    s3, 8(s0)               
-          beqz  s4, _L23                
-_L22:                                   
+          beqz  s4, _L26                
+_L25:                                   
           li    s2, 1                   
           mv    a0, s2                  
           move  sp, s0                  
           lw    ra, -4(s0)              
           lw    s0, 0(s0)               
           jr    ra                      
-_L23:                                   
+_L26:                                   
           li    s2, 1                   
           lw    s3, 8(s0)               
           sub   s4, s3, s2              

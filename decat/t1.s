@@ -18,17 +18,39 @@ _PrintString:
           lw    a0, 4(sp)               
           tail  _catlib__PrintString    
           jr    ra                      
+_PrintBool:                             
+          lw    a0, 4(sp)               
+          tail  _catlib__PrintBool      
+          jr    ra                      
 _Alloc:                                 
           lw    a0, 4(sp)               
           tail  _catlib__Alloc          
           jr    ra                      
 _ReadInteger:                           
-          lw    a0, 4(sp)               
           tail  _catlib__ReadInteger    
           jr    ra                      
-_ReadString:                            
+_ReadLine:                              
+          tail  _catlib__ReadLine       
+          jr    ra                      
+_MUL:                                   
           lw    a0, 4(sp)               
-          tail  _catlib__ReadString     
+          lw    a1, 8(sp)               
+          tail  _catlib__MUL            
+          jr    ra                      
+_DIV:                                   
+          lw    a0, 4(sp)               
+          lw    a1, 8(sp)               
+          tail  _catlib__DIV            
+          jr    ra                      
+_MOD:                                   
+          lw    a0, 4(sp)               
+          lw    a1, 8(sp)               
+          tail  _catlib__MOD            
+          jr    ra                      
+_StringEqual:                           
+          lw    a0, 4(sp)               
+          lw    a1, 8(sp)               
+          tail  _catlib__StringEqual    
           jr    ra                      
 _Halt:                                  
           tail  _catlib__Halt           
@@ -38,7 +60,7 @@ _Main_New:                              # function entry
           sw ra, -4(sp)                 
           move s0, sp                   
           addi sp, sp, -16              
-_L10:                                   
+_L13:                                   
           li    s2, 4                   
           sw    s2, 4(sp)               
           call  _Alloc                  
@@ -56,7 +78,7 @@ main:                                   # function entry
           sw ra, -4(sp)                 
           move s0, sp                   
           addi sp, sp, -16              
-_L11:                                   
+_L14:                                   
           la    s2, _STRING1            
           sw    s2, 4(sp)               
           call  _PrintString            

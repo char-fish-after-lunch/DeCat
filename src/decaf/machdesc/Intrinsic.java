@@ -53,11 +53,34 @@ public final class Intrinsic {
 	public static final Intrinsic PRINT_BOOL = new Intrinsic("_PrintBool", 1,
 			BaseType.VOID);
 	/**
+	 * 乘法<br>目前仅支持32位的乘法，溢出则取低32位
+	 * 参数: 被乘数，乘数
+	 * 返回值：积
+	 */
+	public static final Intrinsic MUL = new Intrinsic("_MUL", 2,
+			BaseType.INT);
+	/**
+	 * 除法<br>
+	 * 参数: 被除数，除数
+	 * 返回值：商
+	 */
+	public static final Intrinsic DIV = new Intrinsic("_DIV", 2,
+			BaseType.INT);
+	/**
+	 * 取余<br>
+	 * 参数: 被除数，除数
+	 * 返回值：余数
+	 */
+	public static final Intrinsic MOD = new Intrinsic("_MOD", 2,
+			BaseType.INT);
+	
+	/**
 	 * 结束程序<br>
 	 * 可以作为子程序调用，也可以直接Goto
 	 */
 	public static final Intrinsic HALT = new Intrinsic("_Halt", 0,
 			BaseType.VOID);
+	
 	/**
 	 * 函数名字
 	 */

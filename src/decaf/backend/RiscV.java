@@ -143,9 +143,14 @@ public class RiscV implements MachineDescription{
 	private void emitIntrinsic() {
 		emitIntrinsicFunc("_PrintInt", 1);
 		emitIntrinsicFunc("_PrintString",1);
+		emitIntrinsicFunc("_PrintBool",1);
 		emitIntrinsicFunc("_Alloc",1);
 		emitIntrinsicFunc("_ReadInteger",0);
-		emitIntrinsicFunc("_ReadString",0);
+		emitIntrinsicFunc("_ReadLine",0);
+		emitIntrinsicFunc("_MUL",2);
+		emitIntrinsicFunc("_DIV",2);
+		emitIntrinsicFunc("_MOD",2);
+		emitIntrinsicFunc("_StringEqual",2);
 		emitIntrinsicFunc("_Halt",0);
 	}
 	
